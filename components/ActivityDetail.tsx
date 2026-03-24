@@ -1,0 +1,267 @@
+import Image from 'next/image'
+import Link from 'next/link'
+import type { Activity } from '@/lib/types'
+
+interface Props {
+  activity: Activity
+}
+
+export function ActivityDetail({ activity }: Props) {
+  const {
+    title, tagline, description, image, category, city, location,
+    date, duration, price, currency, capacity, attendees,
+    host, tags, resources,
+  } = activity
+
+  const spotsLeft = capacity - attendees
+  const pctFull = Math.round((attendees / capacity) * 100)
+  const isFull = spotsLeft === 0
+
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    weekday: 'long',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(new Date(date))
+
+  const formattedPrice =
+    price === 0
+      ? 'Free to attend'
+      : new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency,
+          maximumFractionDigits: 0,
+        }).format(price)
+
+  const resourceIcon = (type: string) => {
+    if (type === 'book') return '📖'
+    if (type === 'film') return '🎞️'
+    if (type === 'playlist') return '🎵'
+    return '📄'
+  }
+
+  return (
+    <article className="max-w-6xl mx-auto px-6 md:px-12 pb-28">
+
+      {/* ── Back link ── */}
+      <div className="py-6">
+        <Link
+          href="/explore"
+          className="inline-flex items-center gap-2 text-sm text-ash hover:text-cream transition-colors"
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+            <path d="M13 7H1M7 1L1 7l6 6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Back to explore
+        </Link>
+      </div>
+
+      {/* ── Hero image ── */}
+      <div className="relative h-[45vh] md:h-[58vh] rounded-2xl overflow-hidden -mx-6 md:-mx-12 mb-12">
+        <Image
+          src={image}
+          alt={title}
+          fill
+          sizes="100vw"
+          className="object-cover grayscale contrast-[1.1] brightness-70"
+          priority
+        />
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-ink/95 via-ink/30 to-transparent" />
+
+        {/* Category + city badge */}
+        <div className="absolute top-6 left-6 flex items-center gap-2">
+          <span className="
+            px-3 py-1.5 rounded-full
+            bg-void/80 backdrop-blur-sm
+            text-xs font-medium text-silver
+            border border-mist/40
+          ">
+            {category}
+          </span>
+          <span className="
+            px-3 py-1.5 rounded-full
+            bg-void/80 backdrop-blur-sm
+            text-xs font-medium text-silver
+            border border-mist/40
+          ">
+            {city}
+          </span>
+        </div>
+
+        {/* Title overlay (desktop) */}
+        <div className="absolute bottom-0 inset-x-0 p-8 md:p-12 hidden md:block">
+          <h1
+            className="font-display text-cream leading-tight tracking-tight"
+            style={{ fontSize: 'clamp(2rem, 4vw, 3.5rem)' }}
+          >
+            {title}
+          </h1>
+          <p className="text-ash text-lg mt-2">{tagline}</p>
+        </div>
+      </div>
+
+      {/* Title (mobile) */}
+      <div className="md:hidden mb-10 space-y-2">
+        <h1 className="font-display text-cream leading-tight" style={{ fontSize: 'clamp(1.8rem, 6vw, 3rem)' }}>
+          {title}
+        </h1>
+        <p className="text-ash text-base">{tagline}</p>
+      </div>
+
+      {/* ── Two-column layout ── */}
+      <div className="grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-14">
+
+        {/* ── Left: Content ── */}
+        <div className="space-y-12">
+
+          {/* Description */}
+          <section>
+            <h2 className="font-display text-2xl text-cream mb-5">About this circle</h2>
+            <div className="space-y-4 text-ash leading-relaxed text-base">
+              {description.split('\n\n').map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          </section>
+
+          {/* Tags */}
+          <section className="flex flex-wrap gap-2">
+            {tags.map(tag => (
+              <span
+                key={tag}
+                className="px-3 py-1 rounded-full border border-mist/60 text-xs text-ash"
+              >
+                #{tag}
+              </span>
+            ))}
+          </section>
+
+          {/* Host */}
+          <section className="border-t border-mist/20 pt-10">
+            <h2 className="font-display text-xl text-cream mb-5">Hosted by</h2>
+            <div className="flex items-start gap-4">
+              <div className="
+                w-14 h-14 rounded-full shrink-0
+                bg-mist flex items-center justify-center
+                text-cream font-display text-xl font-semibold
+              ">
+                {host.name[0]}
+              </div>
+              <div>
+                <p className="font-semibold text-cream">{host.name}</p>
+                <p className="text-sm text-ash mt-1 leading-relaxed">{host.bio}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Resources */}
+          {resources && resources.length > 0 && (
+            <section className="border-t border-mist/20 pt-10">
+              <h2 className="font-display text-xl text-cream mb-5">
+                Reading &amp; Listening
+              </h2>
+              <ul className="space-y-4">
+                {resources.map((r, i) => (
+                  <li key={i} className="flex items-start gap-4">
+                    <span className="text-xl mt-0.5">{resourceIcon(r.type)}</span>
+                    <div>
+                      <span className="text-[10px] uppercase tracking-widest text-mist block mb-0.5">
+                        {r.type}
+                      </span>
+                      <a
+                        href={r.url}
+                        className="text-sm text-ash hover:text-cream underline underline-offset-2 transition-colors"
+                      >
+                        {r.title}
+                      </a>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+        </div>
+
+        {/* ── Right: Booking sidebar ── */}
+        <aside>
+          <div className="sticky top-24 rounded-2xl border border-carbon bg-charcoal p-7 space-y-6">
+
+            {/* Price */}
+            <div className="border-b border-mist/20 pb-5">
+              <p className="font-display text-3xl text-cream font-semibold">
+                {formattedPrice}
+              </p>
+              {price > 0 && (
+                <p className="text-xs text-ash mt-1">per person</p>
+              )}
+            </div>
+
+            {/* Details */}
+            <dl className="space-y-4">
+              {[
+                {
+                  label: 'Date & time',
+                  value: formattedDate,
+                },
+                {
+                  label: 'Duration',
+                  value: duration,
+                },
+                {
+                  label: 'Location',
+                  value: location,
+                },
+              ].map(({ label, value }) => (
+                <div key={label} className="space-y-0.5">
+                  <dt className="text-[10px] uppercase tracking-widest text-mist">{label}</dt>
+                  <dd className="text-sm text-cream">{value}</dd>
+                </div>
+              ))}
+            </dl>
+
+            {/* Capacity bar */}
+            <div className="space-y-2 pt-1">
+              <div className="flex justify-between text-xs">
+                <span className="text-ash">{attendees} joined</span>
+                <span className="text-mist">{capacity} max</span>
+              </div>
+              <div className="h-1.5 bg-carbon rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-cream/60 rounded-full transition-all duration-700"
+                  style={{ width: `${pctFull}%` }}
+                />
+              </div>
+              {!isFull && (
+                <p className="text-xs text-silver">
+                  {spotsLeft} spot{spotsLeft !== 1 ? 's' : ''} remaining
+                </p>
+              )}
+            </div>
+
+            {/* CTA button */}
+            <button
+              className="
+                w-full py-4 rounded-full
+                bg-cream text-ink
+                text-sm font-semibold
+                hover:bg-white active:scale-[0.98]
+                transition-all duration-200
+                disabled:opacity-40 disabled:cursor-not-allowed
+              "
+              disabled={isFull}
+            >
+              {isFull ? 'Join waitlist' : 'Reserve your spot'}
+            </button>
+
+            <p className="text-xs text-center text-mist leading-relaxed">
+              No account needed —<br />confirm via email
+            </p>
+          </div>
+        </aside>
+      </div>
+    </article>
+  )
+}
