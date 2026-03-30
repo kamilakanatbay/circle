@@ -270,24 +270,30 @@ export function ActivityDetail({ activity }: Props) {
             {/* Details */}
             <dl className="space-y-4">
               {[
-                {
-                  label: 'Date & time',
-                  value: formattedDate,
-                },
-                {
-                  label: 'Duration',
-                  value: duration,
-                },
-                {
-                  label: 'Location',
-                  value: location,
-                },
+                { label: 'Date & time', value: formattedDate },
+                { label: 'Duration', value: duration },
               ].map(({ label, value }) => (
                 <div key={label} className="space-y-0.5">
                   <dt className="text-[10px] uppercase tracking-widest text-mist">{label}</dt>
                   <dd className="text-sm text-cream">{value}</dd>
                 </div>
               ))}
+
+              {/* Location — hidden until reserved */}
+              <div className="space-y-0.5">
+                <dt className="text-[10px] uppercase tracking-widest text-mist">Location</dt>
+                {reserved ? (
+                  <dd className="text-sm text-cream">{location}</dd>
+                ) : (
+                  <dd className="flex items-center gap-1.5">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" className="text-mist shrink-0">
+                      <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.5"/>
+                      <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+                    </svg>
+                    <span className="text-xs text-mist italic">Revealed after reservation</span>
+                  </dd>
+                )}
+              </div>
             </dl>
 
             {/* Capacity bar */}
