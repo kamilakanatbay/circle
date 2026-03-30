@@ -135,7 +135,7 @@ export default function LandingPage() {
               {
                 step: '01',
                 title: 'Choose your city',
-                description: 'We curate offline experiences across seven cities worldwide, with more launching soon.',
+                description: 'We curate offline experiences across eight cities worldwide, with more launching soon.',
               },
               {
                 step: '02',
@@ -203,7 +203,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-2 gap-4">
             {[
               { num: '2,400+', label: 'active circles' },
-              { num: '7',      label: 'cities' },
+              { num: '8',      label: 'cities' },
               { num: '0%',     label: 'platform fee' },
               { num: '∞',      label: 'connections made' },
             ].map(({ num, label }) => (
@@ -416,6 +416,16 @@ function getCategoryEmoji(cat: string): string {
     'Cooking': '🍳',
     'Writing': '🖊️',
     'Film': '🎞️',
+    'Offline Gathering': '○',
+    'Slowing Down': '◌',
+    'Nature & Outdoors': '🌿',
+    'Music': '♪',
+    'Crafts & Making': '✂',
+    'Conversation': '◎',
+    'Meditation': '◯',
+    'Art': '◻',
+    'Theatre & Storytelling': '▷',
+    'Language Exchange': '◈',
   }
   return map[cat] ?? '○'
 }

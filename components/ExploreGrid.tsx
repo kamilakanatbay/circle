@@ -2,10 +2,10 @@
 
 import { useState, useMemo, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { activities, CITIES } from '@/lib/data'
+import { activities as staticActivities, CITIES } from '@/lib/data'
 import { ActivityCard } from './ActivityCard'
 import { CategoryFilter } from './CategoryFilter'
-import type { Category, City } from '@/lib/types'
+import type { Activity, Category, City } from '@/lib/types'
 
 export function ExploreGrid() {
   const searchParams = useSearchParams()
@@ -13,6 +13,21 @@ export function ExploreGrid() {
   const [selectedCategory, setSelectedCategory] = useState<Category | null>(null)
   const [selectedCity, setSelectedCity] = useState<City | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [approvedActivities, setApprovedActivities] = useState<Activity[]>([])
+
+  // Fetch approved submissions from Supabase
+  useEffect(() => {
+    fetch('/api/submissions')
+      .then(r => r.json())
+      .then(({ activities }) => { if (Array.isArray(activities)) setApprovedActivities(activities) })
+      .catch(() => {})
+  }, [])
+
+  const activities = useMemo(() => {
+    const approvedIds = new Set(approvedActivities.map(a => a.id))
+    const filtered = staticActivities.filter(a => !approvedIds.has(a.id))
+    return [...filtered, ...approvedActivities]
+  }, [approvedActivities])
 
   // Initialize from URL params on mount
   useEffect(() => {

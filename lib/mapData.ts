@@ -223,6 +223,32 @@ export const MAP_USERS: MapUser[] = [
     waveCount: 3, verified: false, city: 'Los Angeles', neighborhood: 'Venice',
   },
 
+  // ── HAMBURG (3 users) ───────────────────────────────────
+  {
+    id: 'ham-1', firstName: 'Finn', initial: 'F',
+    interests: ['Cooking', 'Food', 'Travel'],
+    tagline: "I'm open to market mornings and good fish",
+    lat: 53.5449, lng: 9.9350,
+    activeUntil: new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString(),
+    waveCount: 5, verified: true, city: 'Hamburg', neighborhood: 'Altona',
+  },
+  {
+    id: 'ham-2', firstName: 'Ida', initial: 'I',
+    interests: ['Photography', 'Art', 'Film'],
+    tagline: "I'm open to harbour walks and film photography",
+    lat: 53.5454, lng: 9.9641,
+    activeUntil: new Date(Date.now() + 5 * 60 * 60 * 1000).toISOString(),
+    waveCount: 3, verified: true, city: 'Hamburg', neighborhood: 'Hafencity',
+  },
+  {
+    id: 'ham-3', firstName: 'Otto', initial: 'O',
+    interests: ['Music', 'Design', 'Startups'],
+    tagline: "I'm open to record digging in the Schanze",
+    lat: 53.5629, lng: 9.9592,
+    activeUntil: new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString(),
+    waveCount: 7, verified: false, city: 'Hamburg', neighborhood: 'Schanzenviertel',
+  },
+
   // ── AMSTERDAM (3 users) ──────────────────────────────────
   {
     id: 'ams-1', firstName: 'Kofi', initial: 'K',

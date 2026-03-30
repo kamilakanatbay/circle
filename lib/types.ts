@@ -8,6 +8,16 @@ export type Category =
   | 'Cooking'
   | 'Writing'
   | 'Film'
+  | 'Offline Gathering'
+  | 'Slowing Down'
+  | 'Nature & Outdoors'
+  | 'Music'
+  | 'Crafts & Making'
+  | 'Conversation'
+  | 'Meditation'
+  | 'Art'
+  | 'Theatre & Storytelling'
+  | 'Language Exchange'
 
 export type City =
   | 'New York'
@@ -17,6 +27,7 @@ export type City =
   | 'Paris'
   | 'Los Angeles'
   | 'Amsterdam'
+  | 'Hamburg'
 
 export interface Host {
   name: string

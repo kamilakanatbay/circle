@@ -11,7 +11,7 @@ export function Footer() {
           <div className="max-w-xs">
             <p className="font-display text-2xl text-cream font-bold">Circle</p>
             <p className="text-sm text-ash mt-2 leading-relaxed">
-              Offline community. Real connection. Seven cities and growing.
+              Offline community. Real connection. Eight cities and growing.
             </p>
           </div>
 
@@ -20,7 +20,7 @@ export function Footer() {
             {[
               { label: 'Explore activities', href: '/explore' },
               { label: 'Browse cities', href: '/explore?view=cities' },
-              { label: 'Host a circle', href: '#' },
+              { label: 'Host a circle', href: '/create' },
               { label: 'About', href: '#' },
               { label: 'Privacy', href: '#' },
               { label: 'Terms', href: '#' },
@@ -42,7 +42,7 @@ export function Footer() {
             © {year} Circle. Made for cities, for people.
           </p>
           <p className="text-xs text-mist">
-            New York · London · Berlin · Tokyo · Paris · LA · Amsterdam
+            New York · London · Berlin · Tokyo · Paris · LA · Amsterdam · Hamburg
           </p>
         </div>
       </div>

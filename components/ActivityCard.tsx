@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import type { Activity } from '@/lib/types'
@@ -9,13 +12,23 @@ interface Props {
 
 export function ActivityCard({ activity, size = 'md' }: Props) {
   const {
-    slug, title, tagline, host, city, date, category,
+    id, slug, title, tagline, host, city, date, category,
     attendees, capacity, price, currency, image,
   } = activity
 
-  const spotsLeft = capacity - attendees
-  const isFull = spotsLeft === 0
-  const pctFull = Math.round((attendees / capacity) * 100)
+  const [reservationCount, setReservationCount] = useState(0)
+
+  useEffect(() => {
+    fetch(`/api/reserve?activityId=${id}`)
+      .then(r => r.json())
+      .then(({ count }) => { if (typeof count === 'number') setReservationCount(count) })
+      .catch(() => {})
+  }, [id])
+
+  const totalAttendees = attendees + reservationCount
+  const spotsLeft = capacity - totalAttendees
+  const isFull = spotsLeft <= 0
+  const pctFull = Math.min(Math.round((totalAttendees / capacity) * 100), 100)
 
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     month: 'short',

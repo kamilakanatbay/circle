@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { HeroIllustration, InkCircleDecoration } from './SVGIllustration'
 
 export function HeroSection() {
-  const cities = ['New York', 'London', 'Berlin', 'Tokyo', 'Paris', 'Los Angeles', 'Amsterdam']
+  const cities = ['New York', 'London', 'Berlin', 'Tokyo', 'Paris', 'Los Angeles', 'Amsterdam', 'Hamburg']
 
   return (
     <section className="relative min-h-screen w-full overflow-hidden flex flex-col bg-ink">
@@ -89,7 +89,7 @@ export function HeroSection() {
 
           {/* Social proof */}
           <p className="text-xs text-mist pt-2">
-            2,400+ circles across 7 cities
+            2,400+ circles across 8 cities
           </p>
         </div>
 

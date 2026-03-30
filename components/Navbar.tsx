@@ -50,6 +50,7 @@ export function Navbar() {
     { label: 'Explore', href: '/explore' },
     { label: 'Cities', href: '/explore?view=cities' },
     { label: 'Map', href: '/map' },
+    { label: 'Host', href: '/create' },
   ]
 
   return (

@@ -1,3 +1,6 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import type { Activity } from '@/lib/types'
@@ -13,9 +16,25 @@ export function ActivityDetail({ activity }: Props) {
     host, tags, resources,
   } = activity
 
-  const spotsLeft = capacity - attendees
-  const pctFull = Math.round((attendees / capacity) * 100)
-  const isFull = spotsLeft === 0
+  const [reservationCount, setReservationCount] = useState(0)
+
+  useEffect(() => {
+    fetch(`/api/reserve?activityId=${activity.id}`)
+      .then(r => r.json())
+      .then(({ count }) => { if (typeof count === 'number') setReservationCount(count) })
+      .catch(() => {})
+  }, [activity.id])
+
+  const totalAttendees = attendees + reservationCount
+  const spotsLeft = capacity - totalAttendees
+  const pctFull = Math.round((totalAttendees / capacity) * 100)
+  const isFull = spotsLeft <= 0
+
+  const [modalOpen, setModalOpen] = useState(false)
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [reserved, setReserved] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
 
   const formattedDate = new Intl.DateTimeFormat('en-US', {
     weekday: 'long',
@@ -40,6 +59,55 @@ export function ActivityDetail({ activity }: Props) {
     if (type === 'film') return '🎞️'
     if (type === 'playlist') return '🎵'
     return '📄'
+  }
+
+  function handleReserve() {
+    if (!isFull) setModalOpen(true)
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!name.trim() || !email.trim()) return
+    setSubmitting(true)
+
+    try {
+      const res = await fetch('/api/reserve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          email,
+          activityId: activity.id,
+          activitySlug: activity.slug,
+          activityTitle: activity.title,
+          activityDate: formattedDate,
+          activityLocation: activity.location,
+          price: activity.price,
+          currency: activity.currency,
+        }),
+      })
+
+      if (!res.ok) {
+        const { error } = await res.json()
+        throw new Error(error ?? 'Something went wrong')
+      }
+
+      setReserved(true)
+      setReservationCount(prev => prev + 1)
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Could not save reservation. Please try again.')
+    } finally {
+      setSubmitting(false)
+    }
+  }
+
+  function handleClose() {
+    setModalOpen(false)
+    if (reserved) {
+      setReserved(false)
+      setName('')
+      setEmail('')
+    }
   }
 
   return (
@@ -225,7 +293,7 @@ export function ActivityDetail({ activity }: Props) {
             {/* Capacity bar */}
             <div className="space-y-2 pt-1">
               <div className="flex justify-between text-xs">
-                <span className="text-ash">{attendees} joined</span>
+                <span className="text-ash">{totalAttendees} joined</span>
                 <span className="text-mist">{capacity} max</span>
               </div>
               <div className="h-1.5 bg-carbon rounded-full overflow-hidden">
@@ -243,6 +311,7 @@ export function ActivityDetail({ activity }: Props) {
 
             {/* CTA button */}
             <button
+              onClick={handleReserve}
               className="
                 w-full py-4 rounded-full
                 bg-cream text-ink
@@ -262,6 +331,114 @@ export function ActivityDetail({ activity }: Props) {
           </div>
         </aside>
       </div>
+
+      {/* ── Reservation modal ── */}
+      {modalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          onClick={handleClose}
+        >
+          {/* Backdrop */}
+          <div className="absolute inset-0 bg-ink/80 backdrop-blur-sm" />
+
+          {/* Panel */}
+          <div
+            className="relative z-10 w-full max-w-md rounded-2xl border border-carbon bg-charcoal p-8 space-y-6"
+            onClick={e => e.stopPropagation()}
+          >
+            {!reserved ? (
+              <>
+                <div className="space-y-1">
+                  <h2 className="font-display text-xl text-cream">Reserve your spot</h2>
+                  <p className="text-sm text-ash">{title} · {formattedDate}</p>
+                </div>
+
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-widest text-mist block">
+                      Your name
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      placeholder="Ada Lovelace"
+                      className="
+                        w-full px-4 py-3 rounded-xl
+                        bg-void border border-carbon
+                        text-cream placeholder:text-ash/50 text-sm
+                        focus:outline-none focus:border-mist
+                        transition-colors
+                      "
+                    />
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] uppercase tracking-widest text-mist block">
+                      Email address
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={email}
+                      onChange={e => setEmail(e.target.value)}
+                      placeholder="ada@example.com"
+                      className="
+                        w-full px-4 py-3 rounded-xl
+                        bg-void border border-carbon
+                        text-cream placeholder:text-ash/50 text-sm
+                        focus:outline-none focus:border-mist
+                        transition-colors
+                      "
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="
+                      w-full py-4 rounded-full
+                      bg-cream text-ink
+                      text-sm font-semibold
+                      hover:bg-white active:scale-[0.98]
+                      transition-all duration-200
+                      disabled:opacity-50 disabled:cursor-not-allowed
+                    "
+                  >
+                    {submitting ? 'Confirming…' : 'Confirm reservation'}
+                  </button>
+                </form>
+
+                <p className="text-xs text-center text-mist">
+                  We&apos;ll send confirmation details to your email.
+                </p>
+              </>
+            ) : (
+              <div className="text-center space-y-5 py-4">
+                <div className="text-4xl">○</div>
+                <div className="space-y-2">
+                  <h2 className="font-display text-2xl text-cream">You&apos;re in.</h2>
+                  <p className="text-ash text-sm leading-relaxed">
+                    Confirmation sent to <span className="text-cream">{email}</span>.<br />
+                    We&apos;ll see you at {title}.
+                  </p>
+                </div>
+                <button
+                  onClick={handleClose}
+                  className="
+                    px-8 py-3 rounded-full
+                    border border-mist text-cream text-sm
+                    hover:border-ash transition-colors
+                  "
+                >
+                  Close
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </article>
   )
 }
