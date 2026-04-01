@@ -53,7 +53,22 @@ export async function GET() {
     return NextResponse.json({ error: error.message }, { status: 500 })
   }
 
-  const activities: Activity[] = (data ?? []).map(s => ({
+  // Auto-expire past events
+  const now = new Date()
+  const pastIds = (data ?? [])
+    .filter(s => new Date(s.date) < now)
+    .map(s => s.id)
+
+  if (pastIds.length > 0) {
+    await supabase
+      .from('submissions')
+      .update({ status: 'inactive' })
+      .in('id', pastIds)
+  }
+
+  const upcoming = (data ?? []).filter(s => new Date(s.date) >= now)
+
+  const activities: Activity[] = (upcoming ?? []).map(s => ({
     id: s.id,
     slug: toSlug(s.title, s.id),
     title: s.title,

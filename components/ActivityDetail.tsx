@@ -81,6 +81,8 @@ export function ActivityDetail({ activity }: Props) {
           activitySlug: activity.slug,
           activityTitle: activity.title,
           activityDate: formattedDate,
+          activityRawDate: activity.date,
+          activityDuration: activity.duration,
           activityLocation: activity.location,
           price: activity.price,
           currency: activity.currency,
@@ -190,7 +192,11 @@ export function ActivityDetail({ activity }: Props) {
             <h2 className="font-display text-2xl text-cream mb-5">About this circle</h2>
             <div className="space-y-4 text-ash leading-relaxed text-base">
               {description.split('\n\n').map((para, i) => (
-                <p key={i}>{para}</p>
+                <p key={i}>
+                  {para.split('\n').map((line, j, arr) => (
+                    <span key={j}>{line}{j < arr.length - 1 && <br />}</span>
+                  ))}
+                </p>
               ))}
             </div>
           </section>
@@ -220,7 +226,7 @@ export function ActivityDetail({ activity }: Props) {
               </div>
               <div>
                 <p className="font-semibold text-cream">{host.name}</p>
-                <p className="text-sm text-ash mt-1 leading-relaxed">{host.bio}</p>
+                <p className="text-sm text-ash mt-1 leading-relaxed whitespace-pre-wrap">{host.bio}</p>
               </div>
             </div>
           </section>

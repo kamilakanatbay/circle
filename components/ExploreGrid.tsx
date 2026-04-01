@@ -14,6 +14,7 @@ export function ExploreGrid() {
   const [selectedCity, setSelectedCity] = useState<City | null>(null)
   const [searchQuery, setSearchQuery] = useState('')
   const [approvedActivities, setApprovedActivities] = useState<Activity[]>([])
+  const [loadingActivities, setLoadingActivities] = useState(true)
 
   // Fetch approved submissions from Supabase
   useEffect(() => {
@@ -21,6 +22,7 @@ export function ExploreGrid() {
       .then(r => r.json())
       .then(({ activities }) => { if (Array.isArray(activities)) setApprovedActivities(activities) })
       .catch(() => {})
+      .finally(() => setLoadingActivities(false))
   }, [])
 
   const activities = useMemo(() => {
@@ -144,7 +146,9 @@ export function ExploreGrid() {
       </div>
 
       {/* Grid */}
-      {filtered.length > 0 ? (
+      {loadingActivities ? (
+        <div className="py-20 text-center text-ash text-sm">Loading circles…</div>
+      ) : filtered.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {filtered.map(activity => (
             <ActivityCard key={activity.id} activity={activity} />
